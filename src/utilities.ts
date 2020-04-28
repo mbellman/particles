@@ -7,11 +7,3 @@ export function indexWhere<T>(array: T[], predicate: (t: T) => boolean): number 
 
   return -1;
 }
-
-export function replace<T>(array: T[], index: number, element: T): T[] {
-  return [
-    ...array.slice(0, index),
-    element,
-    ...array.slice(index + 1)
-  ];
-}

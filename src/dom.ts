@@ -1,5 +1,7 @@
 interface Query {
-  append: (html: string) => Query;
+  __elements: Element[];
+  append: (html: string | Query) => Query;
+  find: (selector: string) => Query;
   html: (html: string) => Query;
   on: (eventName: string, handler: (e: Event) => any) => Query;
 };
@@ -7,7 +9,7 @@ interface Query {
 interface TemplateOptions {
   html: string;
   css?: string;
-  init?: () => void;
+  init?: (query: Query) => void;
 };
 
 interface Template {
@@ -24,30 +26,58 @@ function applyCss(css: string) {
   document.head.appendChild(tag);
 }
 
-export function q(selector: string): Query {
-  const elements: Element[] = [].slice.call(document.querySelectorAll(selector), 0);
+function createNodes(html: string): Element[] {
+  const child = document.createElement('div');
+
+  child.innerHTML = html;
+
+  return [].slice.call(child.childNodes, 0);
+}
+
+export function q(selector: string): Query;
+export function q(elements: Element[]): Query;
+export function q(selector: string | Element[]): Query {
+  let elements: Element[];
+
+  if (typeof selector === 'string') {
+    elements = [].slice.call(document.querySelectorAll(selector as string), 0);
+  } else {
+    elements = selector;
+  }
 
   return {
-    append(html) {
+    __elements: elements,
+    append(html: string | Query) {
       elements.forEach(element => {
-        const child = document.createElement('div');
-
-        child.innerHTML = html;
-
-        const nodes = [].slice.call(child.childNodes, 0);
-
-        nodes.forEach(node => element.appendChild(node));
+        if (typeof html === 'string') {
+          createNodes(html).forEach(node => element.appendChild(node));
+        } else {
+          html.__elements.forEach(node => element.appendChild(node));
+        }
       });
 
       return this;
     },
-    html(html) {
+    find(selector: string) {
+      let found: Element[] = [];
+
+      elements
+        .filter(element => !!element.querySelectorAll)
+        .forEach(element => {
+          found = found.concat([].slice.call(element.querySelectorAll(selector), 0));
+        });
+
+      return q(found);
+    },
+    html(html: string) {
       elements.forEach(element => element.innerHTML = html);
 
       return this;
     },
-    on(eventName, handler) {
-      elements.forEach(element => element.addEventListener(eventName, handler));
+    on(eventName: string, handler: (e: Event) => any) {
+      elements
+        .filter(element => !!element.addEventListener)
+        .forEach(element => element.addEventListener(eventName, handler));
 
       return this;
     }
@@ -64,10 +94,13 @@ export function createTemplate({ html, css, init }: TemplateOptions): Template {
         this.__hasBeenPlaced = true;
       }
 
-      q(target).append(html);
+      const nodes = createNodes(html);
+      const $root = q(nodes);
+
+      q(target).append($root);
 
       if (init) {
-        init();
+        init($root);
       }
     }
   };

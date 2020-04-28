@@ -1,4 +1,4 @@
-import { indexWhere, replace } from './utilities';
+import { indexWhere } from './utilities';
 
 interface ParticleFamily {
   name: string;
@@ -36,5 +36,5 @@ export function addParticleFamily() {
 export function editParticleFamily(family: ParticleFamily) {
   const targetIndex = indexWhere(state.families, ({ id }) => id === family.id);
 
-  state.families = replace(state.families, targetIndex, family);
+  state.families[targetIndex] = family;
 }

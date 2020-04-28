@@ -11,6 +11,25 @@ export const AppTemplate = createTemplate({
       background-color: #013;
     }
 
+    button {
+      background-color: #036;
+      border: 0;
+      border-bottom: 2px solid #002;
+      outline: 1px solid #458;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    button:hover {
+      background-color: #147;
+    }
+
+    button[disabled] {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
     .app {
       border: 2px solid #fff;
       border-radius: 10px;
@@ -46,23 +65,14 @@ export const RightPanelTemplate = createTemplate({
     }
 
     .add-button {
-      background-color: #036;
-      border: 0;
-      color: #fff;
-      cursor: pointer;
       font-size: 20px;
       font-weight: bold;
       padding: 15px 10px;
-      transition: all 0.1s;
       width: 100%;
     }
-
-    .add-button:hover {
-      background-color: #147;
-    }
   `,
-  init() {
-    q('.add-button').on('click', () => {
+  init($root) {
+    $root.find('.add-button').on('click', () => {
       addParticleFamily();
 
       ParticlePanelTemplate.place('.particle-panels-container');
@@ -73,24 +83,64 @@ export const RightPanelTemplate = createTemplate({
 export const ParticlePanelTemplate = createTemplate({
   html: `
     <div class="particle-panel">
-
+      <div class="field">Name: <input name="name"></div>
+      <div class="field">Color: <input name="color"></div>
+      <div class="buttons">
+        <button class="edit-button">
+          Edit Behavior
+        </button>
+        <button class="save-button" disabled>
+          Save
+        </button>
+      </div>
     </div>
   `,
+  init($root) {
+    $root.find('input').on('change', () => {
+    });
+  },
   css: `
     @keyframes open {
       from {
         height: 0px;
       }
       to {
-        height: 150px;
+        height: 120px;
       }
     }
 
     .particle-panel {
       animation: open 0.3s ease-in-out;
       border-bottom: 1px solid #fff;
-      height: 150px;
+      box-sizing: border-box;
+      color: #fff;
+      font-family: Arial;
+      height: 120px;
+      overflow: hidden;
+      padding: 0 10px;
       width: 100%;
+    }
+
+    .field {
+      margin: 10px 10px 0;
+    }
+
+    input {
+      background-color: #013;
+      border: 1px solid #fff;
+      color: #fff;
+    }
+
+    .buttons {
+      display: flex;
+      margin-top: 10px;
+    }
+
+    .edit-button,
+    .save-button {
+      margin: 0 5px;
+      padding: 10px;
+      width: 50%;
     }
   `
 });

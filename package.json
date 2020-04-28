@@ -4,8 +4,7 @@
   "description": "A toy for creating particle systems with programmable autonomous behavior",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "demo": "npm run build && node demo-server.js"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -18,7 +17,6 @@
   },
   "homepage": "https://github.com/mbellman/particles#readme",
   "devDependencies": {
-    "express": "^4.17.1",
     "typescript": "^3.8.3"
   }
 }
